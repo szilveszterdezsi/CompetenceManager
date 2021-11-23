@@ -1,0 +1,162 @@
+﻿<Window x:Class="PL.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PL"
+        mc:Ignorable="d"
+        Title="Team Member Competence Registry" Height="800" Width="1100">
+    <Window.Resources>
+        <Style TargetType="ListBoxItem">
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True" >
+                    <Setter Property="FontWeight" Value="Bold" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="New" Executed="NewCommand_Executed" />
+        <CommandBinding Command="Open" Executed="OpenCommand_Executed" />
+        <CommandBinding Command="Save" Executed="SaveCommand_Executed" />
+        <CommandBinding Command="SaveAs" Executed="SaveAsCommand_Executed" />
+        <CommandBinding Command="Close" Executed="ExitCommand_Executed" />
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Key="S" Modifiers="Ctrl+Alt" Command="SaveAs"/>
+        <KeyBinding Key="E" Modifiers="Alt" Command="Close"/>
+    </Window.InputBindings>
+    <Grid Margin="4">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="21" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Menu IsMainMenu="True" Grid.Row="0" Grid.ColumnSpan="2">
+            <Menu.Background>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}"/>
+            </Menu.Background>
+            <MenuItem Name="miFile" Header="File">
+                <MenuItem Name="miNew" Header="New" Command="New" />
+                <MenuItem Name="miOpen" Header="Open..." Command="Open" />
+                <MenuItem Name="miSave" Header="Save" Command="Save"/>
+                <MenuItem Name="miSaveAs" Header="Save as..." Command="SaveAs" InputGestureText="Ctrl+Alt+S" IsEnabled="false"/>
+                <Separator />
+                <MenuItem Name="miExit" Header="Exit" Command="Close" InputGestureText="Alt+X"/>
+            </MenuItem>
+        </Menu>
+        <GroupBox Name="gbTeams" Margin="4" Grid.Row="1" Header="Teams">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="250" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <GroupBox Name="gbNewTeam" Margin="4" Grid.Column="0" Header="New Team">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Label Name="lblTeamID" Margin="0,4,4,4" Grid.Row="0">ID (auto)</Label>
+                        <TextBox Name="tbTeamID" Margin="4,0,4,4" VerticalContentAlignment="Center" Grid.Row="0" Grid.Column="1" IsEnabled="False"/>
+                        <Label Name="lblTeamName" Margin="0,4,4,4" Grid.Row="1">Team Name</Label>
+                        <TextBox Name="tbTeamName" Margin="4,0,4,4" VerticalContentAlignment="Center" Grid.Row="1" Grid.Column="1"/>
+                        <Label Name="lblTeamMembers" Margin="0,4,4,4" Grid.Row="2">Member(s)</Label>
+                        <TextBox Name="tbTeamMembers" Margin="4,0,4,4" Grid.Row="2" TextWrapping="Wrap" AcceptsReturn="True" Grid.Column="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Height="93" ToolTip="Use a new line for each member!"/>
+                        <Button Name="btnAddTeam" Margin="4" Content="Add Team" Padding="5,0,5,0" Grid.Row="3" Grid.ColumnSpan="2" HorizontalAlignment="Center" Height="25.6" Click="BtnAddTeam_Click"/>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Name="gbAddedTeams" Margin="4" Grid.Column="1" Header="Team">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Label Name="lblAddedTeamNames" Grid.Column="0" Grid.Row="0">Names</Label>
+                        <ListBox Name="lbAddedTeamNames" Margin="4,0,4,4" Grid.Column="0" Grid.Row="1" ItemsSource="{Binding Teams}" SelectionMode="Extended" SelectionChanged="LbAddedTeamNames_SelectionChanged"/>
+                        <Label Name="lblAddedTeamMembers" Grid.Column="1" Grid.Row="0">Team Members</Label>
+                        <ListBox Name="lbAddedTeamMembers" Margin="4,0,4,4" Grid.Column="1" Grid.Row="1" SelectionMode="Extended" SelectionChanged="LbAddedTeamMembers_SelectionChanged"/>
+                        <Label Name="lblAddedTeamCompetences" Grid.Column="2" Grid.Row="0">Competences</Label>
+                        <ListBox Name="lbAddedTeamCompetences" Margin="4,0,4,4" Grid.Column="2" Grid.Row="1" SelectionMode="Extended" SelectionChanged="LbDelink_SelectionChanged"/>
+                        <WrapPanel Grid.Column="0" Grid.Row="2" HorizontalAlignment="Center">
+                            <Button Name="btnRenameTeam" Margin="4" Content="Rename" Padding="5,0,5,0" HorizontalAlignment="Center" Height="25.6" IsEnabled="False" Click="BtnRenameTeam_Click"/>
+                            <Button Name="btnRemoveTeams" Margin="4" Content="Remove" Padding="5,0,5,0" HorizontalAlignment="Center" Height="25.6" IsEnabled="False" Click="BtnRemoveTeams_Click"/>
+                        </WrapPanel>
+                        <WrapPanel Grid.Row="2" Grid.Column="1"  HorizontalAlignment="Center">
+                            <Button Name="btnAddMember" Margin="4" Content="Add" Padding="5,0,5,0" HorizontalAlignment="Center" Height="25.6" IsEnabled="False" Click="BtnAddMember_Click"/>
+                            <Button Name="btnRenameMember" Margin="4" Content="Rename" Padding="5,0,5,0" HorizontalAlignment="Center" Height="25.6" IsEnabled="False" Click="BtnRenameMember_Click"/>
+                            <Button Name="btnRemoveMembers" Margin="4" Content="Remove" Padding="5,0,5,0" HorizontalAlignment="Center" Height="25.6" IsEnabled="False" Click="BtnRemoveMembers_Click"/>
+                            <Button Name="btnLinkMembersInTeamsToCompetences" Margin="4" Content="Link Comp.(s)" Padding="5,0,5,0" HorizontalAlignment="Center" Height="25.6" IsEnabled="False" Click="BtnLinkMembersInTeamsToCompetences_Click"/>
+                        </WrapPanel>
+                        <Button Name="btnDelinkMembersOrTeamsFromCompetences" Margin="4" Content="Delink Competence(s)" Padding="5,0,5,0" HorizontalAlignment="Center" Height="25.6" IsEnabled="False" Grid.Row="2" Grid.Column="2" Click="BtnDelinkMembersOrTeamsFromCompetences_Click"/>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+        </GroupBox>
+        <GroupBox Name="gbCompetences" Margin="4" Grid.Row="2" Header="Competences">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="58" />
+                    <ColumnDefinition Width="191.6"/>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <GroupBox Name="gbNewCompetence" Margin="4,4,3.6,4" Grid.Column="0" Header="New Competence" Grid.ColumnSpan="2">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Label Name="lblCompetenceID" Margin="0,4,4,4" Grid.Row="0">ID (auto)</Label>
+                        <TextBox Name="tbCompetenceID" Margin="4,0,4,4" VerticalContentAlignment="Center" Grid.Row="0" Grid.Column="1" IsEnabled="False"/>
+                        <Label Name="lblCompetenceDescription" Margin="0,4,4,4" Grid.Row="1">Description</Label>
+                        <TextBox Name="tbCompetenceDescription" Margin="4,0,4,4" VerticalContentAlignment="Center" Grid.Row="1" Grid.Column="1"/>
+                        <Button Name="btnAddCompetence" Margin="4" Content="Add Competence" Padding="5,0,5,0" HorizontalAlignment="Center" Grid.Row="2" Grid.ColumnSpan="2" Height="25.6" Click="BtnAddCompetence_Click"/>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Name="gbAddedCompetences" Margin="4.4,4,3.8,4" Grid.Column="2" Header="Competence">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Label Name="lblCompetenceNames" Grid.Column="0" Grid.Row="0">Names</Label>
+                        <ListBox Name="lbCompetenceNames" Margin="4,0,4,4" Grid.Column="0" Grid.Row="1" ItemsSource="{Binding Competences}" SelectionMode="Extended" SelectionChanged="LbCompetenceNames_SelectionChanged"/>
+                        <Label Name="lblCompetencesPresentInTeams" Grid.Column="1" Grid.Row="0">Present in Teams</Label>
+                        <ListBox Name="lbCompetencesPresentInTeams" Margin="4,0,4,4" Grid.Column="1" Grid.Row="1" SelectionMode="Extended" SelectionChanged="LbCompetencesPresentInTeams_SelectionChanged"/>
+                        <Label Name="lblCompetencesHeldByMembers" Grid.Column="2" Grid.Row="0">Held by Team Members</Label>
+                        <ListBox Name="lbCompetencesHeldByMembers" Margin="4,0,4,4" Grid.Column="2" Grid.Row="1" SelectionMode="Extended" SelectionChanged="LbDelink_SelectionChanged"/>
+                        <WrapPanel Grid.Column="0" Grid.Row="2" HorizontalAlignment="Center">
+                            <Button Name="btnRenameCompetence" Margin="4" Content="Rename" Padding="5,0,5,0" HorizontalAlignment="Center" Height="25.6" IsEnabled="False" Click="BtnRenameCompetence_Click"/>
+                            <Button Name="btnRemoveCompetences" Margin="4" Content="Remove" Padding="5,0,5,0" HorizontalAlignment="Center" Height="25.6" IsEnabled="False" Click="BtnRemoveCompetences_Click"/>
+                        </WrapPanel>
+                        <Button Name="btnDelinkTeamsFromCompetences" Margin="4" Content="Delink from Team(s)" Padding="5,0,5,0" HorizontalAlignment="Center" Height="25.6" IsEnabled="False" Grid.Row="2" Grid.Column="1" Click="BtnDelinkTeamsFromCompetences_Click"/>
+                        <Button Name="btnDelinkMembersFromCompetences" Margin="4" Content="Delink from Team Member(s)" Padding="5,0,5,0" HorizontalAlignment="Center" Height="25.6" IsEnabled="False" Grid.Row="2" Grid.Column="2" Click="BtnDelinkMembersFromCompetences_Click"/>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</Window>
